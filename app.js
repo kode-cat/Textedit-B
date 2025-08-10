@@ -100,5 +100,5 @@ Flaro.router({
   "/run": () => document.documentElement.innerHTML = LS('editorVal'),
   "/debug": () => eruda.init(),
 });
-Flaro('input').on('click', () => Flaro.router.go('/run'));
+Flaro('input').on('click', () => window.open(window.location.href + "#/run", '_blank'));
 // The END
