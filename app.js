@@ -185,6 +185,7 @@ let TempData = {
     url: `${window.location.href}#/run`
   }
 };
+Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(), TempData));
 
 (function SaveEditorVal() {
   editorVal(LS('editorVal'));
@@ -227,6 +228,4 @@ Flaro.router({
 Flaro('input').on('click', () => {
   window.open(TempData.browser.url, '_blank')
 });
-
-Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(), TempData));
 // The END
