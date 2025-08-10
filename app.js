@@ -182,7 +182,7 @@ editor.session.on('change', onChange);
 // Initialisations
 let TempData = {
   browser: {
-    url: `${window.location.href}#/run`
+    url: `${window.location.href.split('#')[0]}`
   }
 };
 Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(), TempData));
