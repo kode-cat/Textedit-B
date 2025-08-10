@@ -101,4 +101,4 @@ Flaro.router({
   "/debug": eruda.init,
 });
 Flaro('input').on('click', () => Flaro.router.go('/run'));
-eruda.init();
+// The END
