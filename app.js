@@ -221,7 +221,7 @@ Flaro.router({
   "/run--debug": () => RunPage(true),
   "/debug": () => {
     eruda.init();
-    TempData.browser.url = window.location.href.split('#')[0] + "/run--debug";
+    TempData.browser.url = window.location.href.split('#')[0] + "#/run--debug";
     alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important.\n\n3. Debug mode also doesn't support separate preview window for now.");
   },
 });
