@@ -224,7 +224,7 @@ Flaro.router({
     TempData.browser.url = window.location.href.split('#')[0] + "#/run--debug";
     alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important.\n\n3. Debug mode also doesn't support separate preview window for now.");
   },
-  "*404": () => alert("Unknown url: " + window.location.href + " \nRedirecting to default.");
+  //"*404": () => alert("Unknown url: " + window.location.href + " \nRedirecting to default.");
 });
 Flaro('input').on('click', () => {
   window.open(TempData.browser.url, '_blank')
