@@ -201,7 +201,7 @@ Flaro.router({
   },
   "/debug": () => {
     eruda.init();
-    alert("Currently on Debug mode.\nDebug mode doesn't support separate preview window for now.");
+    alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor,not important\n\n3. Debug mode also doesn't support separate preview window for now.");
   },
 });
 Flaro('input').on('click', () => window.open(window.location.href + "#/run", '_blank'));
