@@ -204,5 +204,8 @@ Flaro.router({
     alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important\n\n3. Debug mode also doesn't support separate preview window for now.");
   },
 });
-Flaro('input').on('click', () => window.open(window.location.href + "#/run", '_blank'));
+Flaro('input').on('click', () => {
+  window.location.hash = "/run"
+  window.open(window.location.href, '_blank')
+});
 // The END
