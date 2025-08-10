@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Textedit</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap');
+    
+    * {
+      margin: 0px;
+      padding: 0px;
+      box-sizing: border-box;
+    }
+    
+    * ::selection {
+      color: white;
+      background: #0CD;
+    }
+    
+    body {
+      background: #1c1c1c;
+      overflow: hidden;
+    }
+    
+    #editor {
+      height: calc(50vh - 30px);
+      margin-top: 30px;
+      width: 100vw;
+      font-size: 15px;
+      overflow: hidden;
+      position: relative;
+      font-family: "JetBrains Mono";
+    }
+    
+    #browser-wrap {
+      width: 100vw;
+      height: 50vh;
+      min-width: 300px;
+      min-height: 300px;
+      display: block;
+      color: #ffffff;
+      outline: none;
+      border: none;
+      font-size: 1.5em;
+      overflow: hidden;
+      padding: 0px;
+    }
+    
+    /* Container for columns and the top "toolbar" */
+    .row {
+      padding: 10px;
+      background: #f1f1f1;
+      border-bottom: 3px solid #0CD;
+    }
+    
+    /* Create three unequal columns that floats next to each other */
+    .column {
+      float: left;
+    }
+    
+    .left {
+      width: 15%;
+    }
+    
+    .right {
+      width: 10%;
+    }
+    
+    .middle {
+      width: 75%;
+    }
+    
+    /* Clear floats after the columns */
+    .row:after {
+      content: "";
+      display: table;
+      clear: both;
+    }
+    
+    /* Three dots */
+    .dot {
+      margin-top: 4px;
+      height: 12px;
+      width: 12px;
+      background-color: #bbb;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    
+    /* Style the input field */
+    input[type=text] {
+      width: 100%;
+      border-radius: 3px;
+      border: none;
+      background-color: #fff;
+      margin-top: -8px;
+      height: 25px;
+      color: #666;
+      padding: 5px;
+      font-size: 20px;
+      outline: none;
+      font-family: "JetBrains Mono", monospace;
+    }
+    
+    input[type=text]:hover {
+      text-decoration: underline;
+    }
+    
+    /* Three bars (hamburger menu) */
+    .bar {
+      width: 17px;
+      height: 3px;
+      background-color: #aaa;
+      margin: 3px 0;
+      display: block;
+    }
+    
+    /* Page content */
+    #browser {
+      padding: 10px;
+      width: 100%;
+      height: calc(100% - 48px);
+      border: none;
+      padding: 0px;
+      background: #fff;
+    }
+    
+    button {
+      width: 16.6vw;
+      height: 30px;
+      line-height: 30px;
+      color: #ffffff;
+      background: #1f1f1f;
+      /* #f92672 */
+      font-size: 20px;
+      border: 1px solid #fff;
+    }
+    
+    button:hover,
+    button:active {
+      color: #000000;
+      background: #ffffff;
+    }
+    
+    .div {
+      position: absolute;
+      top: 0px;
+      left: 0px;
+      display: flex;
+      background: #000000;
+    }
+    
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+    
+    #big {
+      width: 18px;
+      height: 18px;
+    }
+    
+    dialog {
+      padding: 20px;
+      margin: auto;
+    }
+    
+    dialog::backdrop {
+      background: #ffff00;
+    }
+    
+    .code {
+      width: calc(90vw - 40px);
+      height: 50vh;
+    }
+    
+    a {
+      color: blue;
+      text-decoration: none;
+    }
+    
+    select,
+    input {
+      width: 100%;
+      font-size: 30px;
+    }
+    
+    .console-log-div {
+      border: 1px solid gray;
+      padding: 5px 10px;
+      border-radius: 5px;
+      width: 50vw;
+      height: 30vh;
+      background-color: #efefef;
+      display: block;
+      overflow: auto;
+    }
+    
+    @media only screen and (min-width: 600px) {
+      #editor {
+        height: calc(100vh - 30px);
+        margin-top: 30px;
+        width: 50vw;
+      }
+      
+      #browser-wrap {
+        position: absolute;
+        height: 100vh;
+        top: 0px;
+        right: 0px;
+        width: 50vw;
+      }
+      
+      button {
+        width: 8.33vw;
+      }
+    }
+  </style>
+  <script>
+    // Initialisations
+    eruda.init();
+  </script>
+</head>
+<body>
+  <div id="editor"></div>
+  
+  <div id="browser-wrap" class="container">
+    
+    <div class="row">
+      <div class="column left">
+        <span class="dot" style="background:#ED594A;"></span>
+        <span class="dot" style="background:#FDD800;"></span>
+        <span class="dot" style="background:#5AC05A;"></span>
+      </div>
+      <div class="column middle" template><!--file:///C:/projects/index.html-->
+        <input type="text" value="{{browser.url}}" readonly="readonly">
+      </div>
+      <div class="column right">
+        <div style="float:right">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+      </div>
+    </div>
+    
+    <iframe id="browser" src="{{browser.url}}"></iframe>
+    
+  </div>
+  
+  <div class="div">
+    <button onclick="run()">
+      <svg id="big" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-play-fill" viewBox="0 0 16 16">
+        <path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393" />
+      </svg>
+    </button>
+    
+    <button onclick="show()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
+        <path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492M5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0" />
+        <path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.893 3.434-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.893-1.64-.902-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52zm-2.633.283c.246-.835 1.428-.835 1.674 0l.094.319a1.873 1.873 0 0 0 2.693 1.115l.291-.16c.764-.415 1.6.42 1.184 1.185l-.159.292a1.873 1.873 0 0 0 1.116 2.692l.318.094c.835.246.835 1.428 0 1.674l-.319.094a1.873 1.873 0 0 0-1.115 2.693l.16.291c.415.764-.42 1.6-1.185 1.184l-.291-.159a1.873 1.873 0 0 0-2.693 1.116l-.094.318c-.246.835-1.428.835-1.674 0l-.094-.319a1.873 1.873 0 0 0-2.692-1.115l-.292.16c-.764.415-1.6-.42-1.184-1.185l.159-.291A1.873 1.873 0 0 0 1.945 8.93l-.319-.094c-.835-.246-.835-1.428 0-1.674l.319-.094A1.873 1.873 0 0 0 3.06 4.377l-.16-.292c-.415-.764.42-1.6 1.185-1.184l.292.159a1.873 1.873 0 0 0 2.692-1.115z" />
+      </svg>
+    </button>
+    
+    <button onclick="reload()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
+        <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9" />
+        <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z" />
+      </svg>
+    </button>
+    
+    <button onclick="copy()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-copy" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M4 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1zM2 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1v-1h1v1a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h1v1z" />
+      </svg>
+    </button>
+    
+    <button onclick="undo()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-left" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M1.146 4.854a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H12.5A2.5 2.5 0 0 1 15 6.5v8a.5.5 0 0 1-1 0v-8A1.5 1.5 0 0 0 12.5 5H2.707l3.147 3.146a.5.5 0 1 1-.708.708z" />
+      </svg>
+    </button>
+    
+    <button onclick="redo()">
+      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-90deg-right" viewBox="0 0 16 16">
+        <path fill-rule="evenodd" d="M14.854 4.854a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 4H3.5A2.5 2.5 0 0 0 1 6.5v8a.5.5 0 0 0 1 0v-8A1.5 1.5 0 0 1 3.5 5h9.793l-3.147 3.146a.5.5 0 0 0 .708.708z" />
+      </svg>
+    </button>
+  </div>
+  
+  <!-- TODO: Settings Modal -->
+  
+  <script src="https://cdn.jsdelivr.net/gh/kode-cat/flaro/Flaro.js"></script>
+  <script>
+    // App.js
+    let editor = ace.edit("editor");
+    let browser = document.getElementById("browser");
+    let editorVal = (txt) => { if (txt) { editor.session.setValue(txt) } else { return editor.session.getValue() } };
+    let browserVal = (txt) => { if (txt) { browser.srcdoc = txt } else { return browser.srcdoc } };
+    
+    // Ace editor setting 
+    editor.setTheme("ace/theme/monokai");
+    editor.session.setMode("ace/mode/html");
+    editor.session.setValue((typeof localStorage.getItem('editorVal') !== null) ? localStorage.getItem('editorVal') : `<!DOCTYPE html>
+<html lang="en">
+ <head>
+   <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+   <title>Document</title>
+   <!-- CSS -->
+   <link rel="stylesheet" href="styles.css" />
+ </head>
+ <body>
+    <h1>Heading</h1>
+    <p>This is paragraph</p>
+    
+    <!-- JS -->
+    <script src="app.js"><\/script>
+ </body>
+</html>`);
+    
+    //Run Code
+    function run() {
+      browserVal(`${editorVal()}`);
+    }
+    
+    function copy() {
+      navigator.clipboard.writeText(editorVal());
+      alert("Text Copied");
+    }
+    
+    function reload() {
+      location.reload()
+    }
+    
+    function undo() {
+      document.execCommand('undo', false, '');
+    }
+    
+    function redo() {
+      document.execCommand('redo', false, '');
+    }
+    
+    function show(selector) {
+      document.querySelector(selector).showModal()
+    }
+    
+    function hide(selector) {
+      document.querySelector(selector).close()
+    }
+    
+    function onChange() {
+      localStorage.setItem('editorVal', editorVal());
+    }
+    editor.session.on('change', onChange);
+    
+    // Initialisations
+    let TempData = {
+      browser: {
+        url: `${window.location.href}#/run`
+      }
+    };
+    Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(), TempData));
+    
+    (function SaveEditorVal() {
+      editorVal(localStorage.getItem('editorVal'));
+      if (localStorage.getItem('editorVal') == null) localStorage.setItem('editorVal', editorVal());
+      run();
+    })();
+    
+    Flaro.router({
+      "/": () => {},
+      "/run": () => document.documentElement.innerHTML = localStorage.getItem('editorVal'),
+    });
+    Flaro('input').on('click', () => Flaro.router.go('/run'))
+  </script>
+</body>
+</html>
