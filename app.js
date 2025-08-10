@@ -46,6 +46,35 @@ ace.config.loadModule("ace/ext/language_tools", function() {
   });
 });*/
 
+// Function to inject styles/scripts in iframe
+async function loadExternals(doc, baseCDN = '') {
+  // Styles
+  for (const el of doc.querySelectorAll("link[rel='stylesheet'], style")) {
+    const newEl = el.cloneNode(true);
+    if (newEl.tagName === "LINK" && baseCDN && newEl.href.startsWith('./')) {
+      newEl.href = baseCDN + newEl.getAttribute('href');
+    }
+    doc.head.appendChild(newEl);
+  }
+  
+  // Scripts in sequence
+  for (const s of doc.querySelectorAll("script")) {
+    const newScript = document.createElement("script");
+    if (s.src) {
+      newScript.src = baseCDN && s.src.startsWith('./') ? baseCDN + s.getAttribute('src') : s.src;
+      await new Promise((resolve, reject) => {
+        newScript.onload = resolve;
+        newScript.onerror = reject;
+        doc.body.appendChild(newScript);
+      });
+    } else {
+      newScript.textContent = s.textContent;
+      doc.body.appendChild(newScript);
+    }
+    if (s.type) newScript.type = s.type;
+  }
+}
+
 //Run Code
 function run() {
   browserVal(`${editorVal()}`);
@@ -97,7 +126,10 @@ Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(),
 
 Flaro.router({
   "/": () => {},
-  "/run": () => document.documentElement.innerHTML = LS('editorVal'),
+  "/run": () => {
+    document.documentElement.innerHTML = LS('editorVal')
+    loadExternals(document,window.location.href)
+  },
   "/debug": () => eruda.init(),
 });
 Flaro('input').on('click', () => window.open(window.location.href + "#/run", '_blank'));
