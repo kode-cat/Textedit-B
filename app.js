@@ -16,21 +16,90 @@ editor.setTheme("ace/theme/monokai");
 editor.session.setMode("ace/mode/html");
 editor.session.setValue(LS('editorVal') !== null ? LS('editorVal') : `<!DOCTYPE html>
 <html lang="en">
- <head>
-   <meta charset="UTF-8">
-   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-   <title>Document</title>
-   <!-- CSS -->
-   <style></style>
- </head>
- <body>
-    <h1>Heading</h1>
-    <p>This is paragraph</p>
-    
-    <!-- JS -->
-    <script></script>
- </body>
+<head>
+<meta charset="UTF-8">
+<title>Test Page</title>
+<style>
+  body {
+    margin: 0;
+    font-family: sans-serif;
+    background: linear-gradient(45deg, #ff8a00, #e52e71);
+    color: white;
+    text-align: center;
+  }
+  h1 {
+    margin-top: 20px;
+    font-size: 2.5rem;
+    text-shadow: 2px 2px rgba(0,0,0,0.3);
+  }
+  button {
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    background: rgba(255,255,255,0.2);
+    border: 2px solid white;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  button:hover {
+    background: rgba(255,255,255,0.4);
+  }
+  #clickCount {
+    font-size: 1.5rem;
+    margin-top: 15px;
+  }
+  canvas {
+    display: block;
+    margin: 20px auto;
+    background: rgba(255,255,255,0.1);
+    border-radius: 8px;
+  }
+</style>
+</head>
+<body>
+
+<h1>🚀 Test HTML Playground</h1>
+<button id="btn">Click Me!</button>
+<div id="clickCount">Clicks: 0</div>
+
+<canvas id="myCanvas" width="300" height="200"></canvas>
+
+<script>
+  // Click counter
+  let count = 0;
+  document.getElementById('btn').addEventListener('click', () => {
+    count++;
+    document.getElementById('clickCount').textContent = "Clicks: " + count;
+  });
+
+  // Canvas animation (bouncing ball)
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
+  let x = 50, y = 50, dx = 2, dy = 2, radius = 15;
+
+  function drawBall() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.fillStyle = "#fff";
+    ctx.fill();
+    ctx.closePath();
+
+    if (x + dx > canvas.width - radius || x + dx < radius) dx = -dx;
+    if (y + dy > canvas.height - radius || y + dy < radius) dy = -dy;
+
+    x += dx;
+    y += dy;
+
+    requestAnimationFrame(drawBall);
+  }
+
+  drawBall();
+</script>
+
+</body>
 </html>`);
 /*
 editor.setOptions({
