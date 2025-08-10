@@ -193,19 +193,27 @@ Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(),
   run();
 })();
 
+function RunPage() {
+  document.documentElement.innerHTML = LS('editorVal');
+  loadExternals(document,window.location.href);
+}
+
 Flaro.router({
   "/": () => {},
   "/run": () => {
-    document.documentElement.innerHTML = LS('editorVal')
-    loadExternals(document,window.location.href)
+    RunPage();
   },
   "/debug": () => {
     eruda.init();
-    alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important\n\n3. Debug mode also doesn't support separate preview window for now.");
+    alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important.\n\n3. Debug mode also doesn't support separate preview window for now.");
+  },
+  "/debug#/run": () => {
+    RunPage();
+    eruda.init();
+    alert("1. Currently on Debug Mode of preview window.\n\n2. This mode can be used for debugging.");
   },
 });
 Flaro('input').on('click', () => {
-  window.location.hash = "/run"
-  window.open(window.location.href, '_blank')
+  window.open(window.location.href + "#/run", '_blank')
 });
 // The END
