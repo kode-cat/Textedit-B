@@ -193,11 +193,11 @@ Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(),
   run();
 })();
 
-function RunPage() {
+function RunPage(debug = false) {
   let html = LS('editorVal');
 
   // If in debug mode, inject eruda script into <head> or <body>
-  if (window.location.hash.includes('/debug')) {
+  if (debug) {
     let erudaScript = `
       <script src="https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.min.js"><\/script>
       <script>eruda.init();<\/script>
@@ -217,9 +217,8 @@ function RunPage() {
 
 Flaro.router({
   "/": () => {},
-  "/run": () => {
-    RunPage();
-  },
+  "/run": () => RunPage(),
+  "/run--debug": () => RunPage(true),
   "/debug": () => {
     eruda.init();
     alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important.\n\n3. Debug mode also doesn't support separate preview window for now.");
