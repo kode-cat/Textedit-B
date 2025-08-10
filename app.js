@@ -230,8 +230,8 @@ Flaro.router({
         <div>
           <h1 style="font-size:3em;color:#0CD;">404</h1>
           <p style="font-size:1.5em;">Page not found</p>
-          <button style="padding:10px 20px;font-size:1em;background:#0CD;color:#fff;border:none;border-radius:5px;cursor:pointer"
-            onclick="Flaro.router.go('/')">Go Home</button>
+          <button style="padding:10px 20px;font-size:15px;background:#0CD;color:#fff;border:none;border-radius:5px;cursor:pointer"
+            onclick="window.location.hash = '';window.location.reload();">Go Home</button>
         </div>
       </div>
     `;
