@@ -224,7 +224,18 @@ Flaro.router({
     TempData.browser.url = window.location.href.split('#')[0] + "#/run--debug";
     alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important.\n\n3. Debug mode also doesn't support separate preview window for now.");
   },
-  //"*404": () => alert("Unknown url: " + window.location.href + " \nRedirecting to default.");
+  "*": (params) => { // 404 handler
+    document.body.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;height:100vh;text-align:center;font-family:sans-serif;color:#fff;background:#1c1c1c">
+        <div>
+          <h1 style="font-size:3em;color:#0CD;">404</h1>
+          <p style="font-size:1.5em;">Page not found</p>
+          <button style="padding:10px 20px;font-size:1em;background:#0CD;color:#fff;border:none;border-radius:5px;cursor:pointer"
+            onclick="Flaro.router.go('/')">Go Home</button>
+        </div>
+      </div>
+    `;
+  }
 });
 Flaro('input').on('click', () => {
   window.open(TempData.browser.url, '_blank')
