@@ -98,7 +98,7 @@ Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(),
 Flaro.router({
   "/": () => {},
   "/run": () => document.documentElement.innerHTML = LS('editorVal'),
-  "/debug": eruda.init,
+  "/debug": () => eruda.init(),
 });
 Flaro('input').on('click', () => Flaro.router.go('/run'));
 // The END
