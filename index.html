@@ -219,10 +219,6 @@
       }
     }
   </style>
-  <script>
-    // Initialisations
-    eruda.init();
-  </script>
 </head>
 <body>
   <div id="editor"></div>
@@ -372,13 +368,12 @@
       run();
     })();
     
-    /*
     Flaro.router({
       "/": () => {},
-      "/run": () => document.documentElement.innerHTML = localStorage.getItem('editorVal')
+      "/run": () => document.documentElement.innerHTML = localStorage.getItem('editorVal'),
+      "/debug": () => eruda.init()
     });
     Flaro('input').on('click', () => Flaro.router.go('/run'));
-    */
   </script>
 </body>
 </html>
