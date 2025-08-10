@@ -371,9 +371,10 @@
     Flaro.router({
       "/": () => {},
       "/run": () => document.documentElement.innerHTML = localStorage.getItem('editorVal'),
-      "/debug": () => eruda.init()
+      "/debug": () => eruda.init(),
     });
     Flaro('input').on('click', () => Flaro.router.go('/run'));
+    Flaro.ready(erdua.init);
   </script>
 </body>
 </html>
