@@ -194,8 +194,25 @@ Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(),
 })();
 
 function RunPage() {
-  document.documentElement.innerHTML = LS('editorVal');
-  loadExternals(document,window.location.href);
+  let html = LS('editorVal');
+
+  // If in debug mode, inject eruda script into <head> or <body>
+  if (window.location.hash.includes('/debug')) {
+    let erudaScript = `
+      <script src="https://cdn.jsdelivr.net/npm/eruda@3.4.3/eruda.min.js"><\/script>
+      <script>eruda.init();<\/script>
+    `;
+    // Put it before </body> if possible
+    html = html.replace(/<\/body>/i, erudaScript + '</body>');
+    if (html === LS('editorVal')) {
+      // If no </body> found, just append
+      html += erudaScript;
+      alert("1. On Debug Preview mode.\n\n2. Can be used for debugging this page.");
+    }
+  }
+
+  document.documentElement.innerHTML = html;
+  loadExternals(document, window.location.href);
 }
 
 Flaro.router({
@@ -206,11 +223,6 @@ Flaro.router({
   "/debug": () => {
     eruda.init();
     alert("1. Currently on Debug mode.\n\n2. This mode is only used for debugging editor, not important.\n\n3. Debug mode also doesn't support separate preview window for now.");
-  },
-  "/debug#/run": () => {
-    RunPage();
-    eruda.init();
-    alert("1. Currently on Debug Mode of preview window.\n\n2. This mode can be used for debugging.");
   },
 });
 Flaro('input').on('click', () => {
