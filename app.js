@@ -199,7 +199,10 @@ Flaro.router({
     document.documentElement.innerHTML = LS('editorVal')
     loadExternals(document,window.location.href)
   },
-  "/debug": () => eruda.init(),
+  "/debug": () => {
+    eruda.init();
+    alert("Currently on Debug mode.\nDebug mode doesn't support separate preview window for now.");
+  },
 });
 Flaro('input').on('click', () => window.open(window.location.href + "#/run", '_blank'));
 // The END
