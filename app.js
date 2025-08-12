@@ -3,18 +3,24 @@ let editor = ace.edit("editor");
 let browser = document.getElementById("browser");
 let editorVal = (txt) => { if (txt) { editor.session.setValue(txt) } else { return editor.session.getValue() } };
 let browserVal = (txt) => { if (txt) { browser.srcdoc = txt } else { return browser.srcdoc } };
-let LS = (k, v) => {
+
+// Replaced LS with an async DB function using localforage
+async function DB(k, v) {
   if (typeof k === 'string') {
     if (!k && !v) return undefined;
-    if (k && !v) return localStorage.getItem(k);
-    if (k && v) localStorage.setItem(k, v);
+    if (k && !v) return await localforage.getItem(k);
+    if (k && v) await localforage.setItem(k, v);
   }
 }
 
 // Ace editor setting 
 editor.setTheme("ace/theme/monokai");
 editor.session.setMode("ace/mode/html");
-editor.session.setValue(LS('editorVal') !== null ? LS('editorVal') : `<!DOCTYPE html>
+
+// The initial value is now set after the localforage data is retrieved
+(async () => {
+  const savedVal = await DB('editorVal');
+  editor.session.setValue(savedVal !== null ? savedVal : `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -101,6 +107,11 @@ editor.session.setValue(LS('editorVal') !== null ? LS('editorVal') : `<!DOCTYPE 
 
 </body>
 </html>`);
+  
+  // Now run the code after the editor value is set
+  run();
+})();
+
 /*
 editor.setOptions({
   enableBasicAutocompletion: true,
@@ -174,8 +185,9 @@ function hide(selector) {
   document.querySelector(selector).close()
 }
 
-function onChange() {
-  LS('editorVal', editorVal());
+// onChange is now an async function
+async function onChange() {
+  await DB('editorVal', editorVal());
 }
 editor.session.on('change', onChange);
 
@@ -185,16 +197,21 @@ let TempData = {
     url: `${window.location.href.split('#')[0]}#/run`
   }
 };
-Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(), TempData));
 
-(function SaveEditorVal() {
-  editorVal(LS('editorVal'));
-  if (LS('editorVal') === null) LS('editorVal', editorVal());
+// The SaveEditorVal IIFE is now an async function that handles localforage
+(async function SaveEditorVal() {
+  const savedVal = await DB('editorVal');
+  if (savedVal !== null) {
+    editorVal(savedVal);
+  } else {
+    await DB('editorVal', editorVal());
+  }
   run();
 })();
 
-function RunPage(debug = false) {
-  let html = LS('editorVal');
+// RunPage is now an async function
+async function RunPage(debug = false) {
+  let html = await DB('editorVal');
 
   // If in debug mode, inject eruda script into <head> or <body>
   if (debug) {
@@ -204,7 +221,7 @@ function RunPage(debug = false) {
     `;
     // Put it before </body> if possible
     html = html.replace(/<\/body>/i, erudaScript + '</body>');
-    if (html === LS('editorVal')) {
+    if (html === (await DB('editorVal'))) {
       // If no </body> found, just append
       html += erudaScript;
       alert("1. On Debug Preview mode.\n\n2. Can be used for debugging this page.");
@@ -217,8 +234,8 @@ function RunPage(debug = false) {
 
 Flaro.router({
   "/": () => {},
-  "/run": () => RunPage(),
-  "/run--debug": () => RunPage(true),
+  "/run": async () => await RunPage(),
+  "/run--debug": async () => await RunPage(true),
   "/debug": () => {
     eruda.init();
     TempData.browser.url = window.location.href.split('#')[0] + "#/run--debug";
@@ -240,4 +257,5 @@ Flaro.router({
 Flaro('input').on('click', () => {
   window.open(TempData.browser.url, '_blank')
 });
+Flaro('*[template]').html(Flaro.parseAndUseTemplate(Flaro('*[template]').html(), TempData));
 // The END
